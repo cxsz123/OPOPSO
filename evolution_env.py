@@ -3,7 +3,6 @@ import time
 import sys
 import numpy as np
 from typing import List, Tuple
-# 导入全局默认值，用于兼容老代码
 from config import dim, MaxFEs, initial_pop_size, target_pop_size, counternum
 
 try:
@@ -72,7 +71,6 @@ def generate_func_obj(func_id: int) -> Benchmarks:
 
 
 class EvolutionaryEnv:
-    # 关键：参数默认值全部取全局配置，老代码不传参时和原行为完全一致
     def __init__(self, func_id=1, dim_env=dim, max_fes_env=MaxFEs, init_pop=initial_pop_size, tgt_pop=target_pop_size):
         self.func_id = func_id
         self.dim = dim_env
@@ -90,7 +88,7 @@ class EvolutionaryEnv:
         self.prev_cos_sim_history = []
         self.current_cos_sim_history = []
 
-        # 收敛曲线记录（新增，不影响原有逻辑）
+        # 收敛曲线记录
         self.record_points = np.array([int(self.MaxFEs * (i + 1) / counternum) for i in range(counternum)], dtype=int)
         self.convergence_records = np.zeros(counternum + 1, dtype=np.float64)
         self.record_counter = 0
@@ -266,7 +264,7 @@ class EvolutionaryEnv:
                     if new_val < self.best_fitness:
                         self.best_fitness = new_val
 
-                    # 记录收敛点（新增，仅额外记录，不影响核心逻辑）
+                    # 记录收敛点
                     while self.record_counter < counternum and self.FEs >= self.record_points[self.record_counter]:
                         self.convergence_records[self.record_counter + 1] = self.best_fitness - self.opt_val
                         self.record_counter += 1
@@ -274,7 +272,7 @@ class EvolutionaryEnv:
         self.prune_population()
         self.prev_cos_sim_history = self.current_cos_sim_history.copy()
 
-        # 奖励计算（完全和原来一致）
+        # 奖励计算
         if individual_progresses:
             max_progress = max(individual_progresses)
             min_progress = min(individual_progresses)
